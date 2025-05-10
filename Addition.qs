@@ -4,12 +4,14 @@ namespace Quantum {
     open Microsoft.Quantum.Intrinsic;
 
     operation Add(left : Qubit[], right : Qubit[], results : Qubit[]) : Unit {
+        ResetAll(results);
         use (carry, newCarry) = (Qubit(), Qubit()) {
             for i in 0 .. Length(left) - 1 {
                 FullAdder(left[i], right[i], carry, results[i], newCarry);
                 SWAP(carry, newCarry);
             }
             Reset(carry);
+            Reset(newCarry);
         }
     }
 
