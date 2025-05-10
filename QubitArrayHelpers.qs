@@ -9,6 +9,14 @@ namespace Quantum {
         }
     }
 
+    operation SetValue(qubits : Qubit[], value : Int): Unit {
+        for i in 0 .. Length(qubits) - 1 {
+            if ((1 &&& (value >>> i)) == 1) {
+                X(qubits[i]);
+            }
+        }
+    }
+
     operation Measure(qubits : Qubit[]) : Result[] {
         mutable results = new Result[Length(qubits)];
         for i in 0 .. Length(qubits) - 1 {
