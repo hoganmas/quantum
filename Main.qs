@@ -6,13 +6,14 @@
     @EntryPoint()
     operation Main() : Result[] {  
         let length = 4;
-        use (a, b, c) = (Qubit[length], Qubit[length], Qubit[length]) {
+        use (a, b, c) = (Qubit[length], Qubit[length], Qubit[2 * length]) {
             
             // Both a and b will be in a superposition of 0..7
-            Hadamard(a, 3);
-            Hadamard(b, 3);
+            SetValue(a, 5);
+            SetValue(b, 7);
 
-            Multiply(a, b, c);
+            Message("Starting multiplication");
+            DoubleLengthMultiply(a, b, c);
 
             let results = Measure(c);
             let result = AsInt(results);

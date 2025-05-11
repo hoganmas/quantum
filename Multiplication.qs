@@ -3,28 +3,45 @@ namespace Quantum {
     open Microsoft.Quantum.Canon;
     open Microsoft.Quantum.Intrinsic;
 
-    operation Multiply(left : Qubit[], right : Qubit[], results : Qubit[]) : Unit {        
-        use (operand1, operand2) = (Qubit[Length(left)], Qubit[Length(left)]) {
+    operation FixedLengthMultiply(left : Qubit[], right : Qubit[], results : Qubit[]) : Unit {  
+        Fact(Length(left) == Length(right), "Left and right operand arrays must be the same length");
+        Fact(Length(results) == Length(left), "Results array must be the same length as left and right operand arrays");
+
+        use operand = Qubit[Length(right)] {
             for i in 0 .. Length(left) - 1 {
-                // Swap operand2 with results
-                if (i > 0) {
-                    for j in i .. Length(left) - 1 {
-                        SWAP(operand2[j], results[j]);
-                        Reset(results[j]);
-                    }
-                }
-
+                Message($"Multiplication Iteration {i}");
+                
                 // Generate operand1
-                for j in 0 .. Length(left) - 1 - i {
-                    Reset(operand1[i + j]);
-                    CCNOT(left[i], right[j], operand1[i + j]);
+                for j in 0 .. Length(right) - 1 {
+                    Reset(operand[j]);
+                    CCNOT(left[i], right[j], operand[j]);
                 }
 
-                AddSlice(operand1, operand2, results, i);
+                IncrementWithOffset(results, operand, i);
             }
 
-            ResetAll(operand1);
-            ResetAll(operand2);
+            ResetAll(operand);
+        }
+    }
+
+    operation DoubleLengthMultiply(left : Qubit[], right : Qubit[], results : Qubit[]) : Unit {  
+        Fact(Length(left) == Length(right), "Left and right operand arrays must be the same length");
+        Fact(Length(results) == Length(left) * 2, "Results array must be double the length of left and right operand arrays");
+
+        use operand = Qubit[Length(right)] {
+            for i in 0 .. Length(left) - 1 {
+                Message($"Multiplication Iteration {i}");
+                
+                // Generate operand1
+                for j in 0 .. Length(right) - 1 {
+                    Reset(operand[j]);
+                    CCNOT(left[i], right[j], operand[j]);
+                }
+
+                IncrementWithOffset(results, operand, i);
+            }
+
+            ResetAll(operand);
         }
     }
 }
