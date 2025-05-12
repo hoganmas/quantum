@@ -3,10 +3,7 @@ namespace Quantum {
     open Microsoft.Quantum.Canon;
     open Microsoft.Quantum.Intrinsic;
 
-    operation FixedLengthMultiply(left : Qubit[], right : Qubit[], results : Qubit[]) : Unit {  
-        Fact(Length(left) == Length(right), "Left and right operand arrays must be the same length");
-        Fact(Length(results) == Length(left), "Results array must be the same length as left and right operand arrays");
-
+    operation Multiply(left : Qubit[], right : Qubit[], results : Qubit[]) : Unit {  
         use operand = Qubit[Length(right)] {
             for i in 0 .. Length(left) - 1 {
                 Message($"Multiplication Iteration {i}");
@@ -24,24 +21,39 @@ namespace Quantum {
         }
     }
 
-    operation DoubleLengthMultiply(left : Qubit[], right : Qubit[], results : Qubit[]) : Unit {  
-        Fact(Length(left) == Length(right), "Left and right operand arrays must be the same length");
-        Fact(Length(results) == Length(left) * 2, "Results array must be double the length of left and right operand arrays");
+    operation MultiplyConstant(left : Qubit[], right : Int, results : Qubit[]) : Unit {  
+        let (aux, logAux) = GetAuxiliarModulus(right);
 
-        use operand = Qubit[Length(right)] {
-            for i in 0 .. Length(left) - 1 {
-                Message($"Multiplication Iteration {i}");
-                
-                // Generate operand1
-                for j in 0 .. Length(right) - 1 {
-                    Reset(operand[j]);
-                    CCNOT(left[i], right[j], operand[j]);
+        for i in 0 .. Length(left) - 1 {
+            Message($"Multiplication Iteration {i}");
+
+            use (carry, newCarry, temp, rightBit, sum) = (Qubit(), Qubit(), Qubit(), Qubit(), Qubit()) {
+                for j in 0 .. logAux - 1 {
+                    Message($"Multiplication Iteration {i} - Bit {j}");
+                    
+                    GetBit(right, j, temp);
+                    CCNOT(left[i], temp, rightBit);
+
+                    FullAdder(results[i + j], rightBit, carry, sum, newCarry);
+                    SWAP(carry, newCarry);
+                    SWAP(sum, results[i + j]);
+
+                    Reset(rightBit);
+                    Reset(temp);
                 }
 
-                IncrementWithOffset(results, operand, i);
+                for j in logAux .. Length(results) - i - 1 {
+                    Message($"Multiplication Iteration {i} - Bit {j}");
+                    
+                    HalfAdder(results[i + j], carry, sum, newCarry);
+                    SWAP(carry, newCarry);
+                    SWAP(sum, results[i + j]);
+                }
+                
+                Reset(carry);
+                Reset(newCarry);
+                Reset(sum);
             }
-
-            ResetAll(operand);
         }
     }
 }

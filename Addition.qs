@@ -59,7 +59,7 @@ namespace Quantum {
             Reset(sum);
         }
     }
-
+    
     operation FullAdder(q1 : Qubit, q2 : Qubit, q3 : Qubit, sum: Qubit, carry : Qubit) : Unit {
         Reset(sum);
         Reset(carry);
