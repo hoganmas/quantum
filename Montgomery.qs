@@ -32,7 +32,7 @@ namespace Quantum {
     function GetAuxiliarModulus(modulus : Int) : (Int, Int) {
         mutable result = 1;
         mutable logResult = 0;
-        while (result < modulus) {
+        while (result <= modulus) {
             set result = result <<< 1;
             set logResult = logResult + 1;
         }

@@ -5,6 +5,6 @@
     
     @EntryPoint()
     operation Main() : Unit {  
-        TestAddition();
+        TestSubtraction();
     }
 }
