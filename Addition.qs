@@ -20,7 +20,6 @@ namespace Quantum {
     operation Increment(left : Qubit[], right : Qubit[]) : Unit {
         use (carry, newCarry, sum) = (Qubit(), Qubit(), Qubit()) {
             for i in 0 .. Length(right) - 1 {
-                Message($"Increment Iteration {i}");
                 FullAdder(left[i], right[i], carry, sum, newCarry);
                 SWAP(carry, newCarry);
                 SWAP(sum, left[i]);
@@ -43,7 +42,6 @@ namespace Quantum {
 
         use (carry, newCarry, rightBit, sum) = (Qubit(), Qubit(), Qubit(), Qubit()) {
             for i in 0 .. logAux - 1 {
-                Message($"Increment Iteration {i}");
                 GetBit(right, i, rightBit);
                 FullAdder(left[i], rightBit, carry, sum, newCarry);
 
@@ -54,7 +52,6 @@ namespace Quantum {
             }
 
             for i in logAux .. Length(left) - 1 {
-                Message($"Increment Iteration {i}");
                 HalfAdder(left[i], carry, sum, newCarry);
                 SWAP(carry, newCarry);
                 SWAP(sum, left[i]);
@@ -70,14 +67,12 @@ namespace Quantum {
     operation IncrementWithOffset(left : Qubit[], right : Qubit[], leftIndex : Int) : Unit {
         use (carry, newCarry, sum) = (Qubit(), Qubit(), Qubit()) {
             for i in 0 .. Min(Length(right), Length(left) - leftIndex) - 1 {
-                Message($"Increment Iteration {i}");
                 FullAdder(left[i + leftIndex], right[i], carry, sum, newCarry);
                 SWAP(carry, newCarry);
                 SWAP(sum, left[i + leftIndex]);
             }
 
             for i in Min(Length(right), Length(left) - leftIndex) .. Length(left) - leftIndex - 1 {
-                Message($"Increment Iteration {i}");
                 HalfAdder(left[i + leftIndex], carry, sum, newCarry);
                 SWAP(carry, newCarry);
                 SWAP(sum, left[i + leftIndex]);
