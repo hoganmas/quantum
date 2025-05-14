@@ -19,15 +19,6 @@ namespace Quantum {
         }
     }
 
-    operation Measure(qubits : Qubit[]) : Result[] {
-        mutable results = new Result[Length(qubits)];
-        for i in 0 .. Length(qubits) - 1 {
-            set results w/= i <- M(qubits[i]);
-            Reset(qubits[i]);
-        }
-        return results;
-    }
-
     operation FourierTransform(qubits : Qubit[]): Unit {
         for i in 0 .. Length(qubits) - 1 {
             H(qubits[i]);

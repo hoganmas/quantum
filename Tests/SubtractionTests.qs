@@ -2,6 +2,8 @@ namespace Quantum {
     open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Canon;
     open Microsoft.Quantum.Intrinsic;
+    open Microsoft.Quantum.Measurement;
+    open Microsoft.Quantum.Convert;
 
     operation TestSubtraction() : Unit {
         Message("Testing Subtraction");
@@ -13,8 +15,8 @@ namespace Quantum {
                     SetValue(qubits, i);
                     DecrementConstant(qubits, j);
 
-                    let result = AsInt(Measure(qubits));
-                    Message($"Result of {i} - {j}: {result}");
+                    let result = ResultArrayAsInt(MeasureEachZ(qubits));
+                    Fact(result == (i - j), $"Result of {i} - {j}: {result} (Actual) vs {i - j} (Expected)");
                     ResetAll(qubits);
                 }
             }

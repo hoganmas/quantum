@@ -2,6 +2,8 @@ namespace Quantum {
     open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Canon;
     open Microsoft.Quantum.Intrinsic;
+    open Microsoft.Quantum.Measurement;
+    open Microsoft.Quantum.Convert;
 
     operation TestAddition() : Unit {
         Message("Testing Addition");
@@ -21,8 +23,9 @@ namespace Quantum {
 
                     Increment(left, right);
 
-                    let result = AsInt(Measure(left));
-                    Message($"Result of {i} + {j}: {result}");
+                    let result = ResultArrayAsInt(MeasureEachZ(left));
+                    Fact(result == (i + j), $"Result of {i} + {j}: {result} (Actual) vs {i + j} (Expected)");
+
                     ResetAll(left);
                     ResetAll(right);
                 }
@@ -40,8 +43,9 @@ namespace Quantum {
                     SetValue(qubits, i);
                     IncrementConstant(qubits, j);
 
-                    let result = AsInt(Measure(qubits));
-                    Message($"Result of {i} + {j}: {result}");
+                    let result = ResultArrayAsInt(MeasureEachZ(qubits));
+                    Fact(result == (i + j), $"Result of {i} + {j}: {result} (Actual) vs {i + j} (Expected)");
+
                     ResetAll(qubits);
                 }
             }
