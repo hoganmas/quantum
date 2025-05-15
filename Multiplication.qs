@@ -27,7 +27,7 @@ namespace Quantum {
 
         for i in 0 .. Length(left) - 1 {
             use (carry, newCarry, temp, rightBit, sum) = (Qubit(), Qubit(), Qubit(), Qubit(), Qubit()) {
-                for j in 0 .. logAux - 1 {
+                for j in 0 .. Min(logAux, Length(results) - i) - 1 {
                     GetBit(right, j, temp);
                     CCNOT(left[i], temp, rightBit);
 
