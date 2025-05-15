@@ -6,5 +6,9 @@
     @EntryPoint()
     operation Main() : Unit {  
         TestAddition();
+        TestMultiplication();
+        TestSubtraction();
+        TestComparison();
+        TestFourierTransform();
     }
 }

@@ -31,4 +31,33 @@ namespace Quantum {
             }
         }
     }
+
+    operation ConstantLessThan(left : Int, right : Qubit[], result : Qubit) : Unit {
+        use (leftBit, notEquals, subResult) = (Qubit(), Qubit(), Qubit()) {
+            for i in 0 .. Length(right) - 1 {
+                // notEquals := left[i] XOR right[i]
+                GetBit(left, i, leftBit);
+                CNOT(leftBit, notEquals);
+                Reset(leftBit);
+
+                if (i < Length(right)) {
+                    CNOT(right[i], notEquals);
+                }
+
+                // result := notEquals ? right[i] : result
+                if (i < Length(right)) {
+                    Mux(right[i], result, notEquals, subResult);
+                }
+                else {
+                    X(notEquals);
+                    CCNOT(notEquals, result, subResult);
+                    X(notEquals);
+                }
+
+                SWAP(result, subResult);
+                Reset(subResult);
+                Reset(notEquals);
+            }
+        }
+    }
 }

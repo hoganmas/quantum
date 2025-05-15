@@ -5,16 +5,17 @@ namespace Quantum {
 
     operation Multiply(left : Qubit[], right : Qubit[], results : Qubit[]) : Unit {  
         use operand = Qubit[Length(right)] {
-            for i in 0 .. Length(left) - 1 {
-                Message($"Multiplication Iteration {i}");
-                
+            for i in 0 .. Length(left) - 1 {                
                 // Generate operand1
                 for j in 0 .. Length(right) - 1 {
                     Reset(operand[j]);
                     CCNOT(left[i], right[j], operand[j]);
                 }
 
-                IncrementWithOffset(results, operand, i);
+                Increment(
+                    results[i .. Min(Length(results) - 1, i + Length(operand))], 
+                    operand[0 .. Min(Length(results) - i, Length(operand)) - 1]
+                );
             }
 
             ResetAll(operand);
@@ -25,12 +26,8 @@ namespace Quantum {
         let (aux, logAux) = GetAuxiliarModulus(right);
 
         for i in 0 .. Length(left) - 1 {
-            Message($"Multiplication Iteration {i}");
-
             use (carry, newCarry, temp, rightBit, sum) = (Qubit(), Qubit(), Qubit(), Qubit(), Qubit()) {
                 for j in 0 .. logAux - 1 {
-                    Message($"Multiplication Iteration {i} - Bit {j}");
-                    
                     GetBit(right, j, temp);
                     CCNOT(left[i], temp, rightBit);
 
@@ -43,8 +40,6 @@ namespace Quantum {
                 }
 
                 for j in logAux .. Length(results) - i - 1 {
-                    Message($"Multiplication Iteration {i} - Bit {j}");
-                    
                     HalfAdder(results[i + j], carry, sum, newCarry);
                     SWAP(carry, newCarry);
                     SWAP(sum, results[i + j]);

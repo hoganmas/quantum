@@ -63,24 +63,4 @@ namespace Quantum {
             Reset(sum);
         }        
     }
-
-    operation IncrementWithOffset(left : Qubit[], right : Qubit[], leftIndex : Int) : Unit {
-        use (carry, newCarry, sum) = (Qubit(), Qubit(), Qubit()) {
-            for i in 0 .. Min(Length(right), Length(left) - leftIndex) - 1 {
-                FullAdder(left[i + leftIndex], right[i], carry, sum, newCarry);
-                SWAP(carry, newCarry);
-                SWAP(sum, left[i + leftIndex]);
-            }
-
-            for i in Min(Length(right), Length(left) - leftIndex) .. Length(left) - leftIndex - 1 {
-                HalfAdder(left[i + leftIndex], carry, sum, newCarry);
-                SWAP(carry, newCarry);
-                SWAP(sum, left[i + leftIndex]);
-            }
-            
-            Reset(carry);
-            Reset(newCarry);
-            Reset(sum);
-        }
-    }
 }

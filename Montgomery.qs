@@ -60,4 +60,30 @@ namespace Quantum {
         let (gcd, x, y) = ExtendedEuclidean(aux, modulus);
         return aux - x;
     }
+
+    operation Reduce(value : Qubit[], space : MontgomerySpace) : Unit {
+        use q = Qubit[space::logAux] {
+            MultiplyConstant(value[0 .. space::logAux - 1], space::negInverseModulus, q);
+
+            use p = Qubit[2 * space::logAux] {
+                MultiplyConstant(q, space::modulus, p);
+
+                for i in 0 .. space::logAux - 1 {
+                    SWAP(q[i], p[i + space::logAux]);
+                }
+
+                ResetAll(p);
+            }
+
+            for i in 0 .. space::logAux - 1 {
+                Reset(value[i]);
+                SWAP(value[i], value[i + space::logAux]);
+            }
+
+            Increment(value[0 .. space::logAux - 1], q);
+            ConditionalDecrementConstant(value[0 ..space::logAux - 1], space::modulus);
+
+            ResetAll(q);
+        }
+    }
 }
