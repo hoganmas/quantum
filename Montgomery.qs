@@ -61,7 +61,7 @@ namespace Quantum {
         return aux - x;
     }
 
-    operation Reduce(value : Qubit[], space : MontgomerySpace) : Unit {
+    operation MontgomeryReduce(value : Qubit[], space : MontgomerySpace) : Unit {
         use q = Qubit[space::logAux] {
             MultiplyConstant(value[0 .. space::logAux - 1], space::negInverseModulus, q);
 
@@ -77,7 +77,10 @@ namespace Quantum {
 
             for i in 0 .. space::logAux - 1 {
                 Reset(value[i]);
-                SWAP(value[i], value[i + space::logAux]);
+
+                if (i + space::logAux < Length(value)) {
+                    SWAP(value[i], value[i + space::logAux]);
+                }
             }
 
             Increment(value[0 .. space::logAux - 1], q);
@@ -85,5 +88,35 @@ namespace Quantum {
 
             ResetAll(q);
         }
+    }
+
+    operation MontgomeryMultiply(left : Qubit[], right : Qubit[], results : Qubit[], space : MontgomerySpace) : Unit {
+        use p = Qubit[2 * space::logAux] {
+            Multiply(left, right, p);
+            MontgomeryReduce(p, space);
+
+            for i in 0 .. space::logAux - 1 {
+                SWAP(p[i], results[i]);
+            }
+
+            ResetAll(p);
+        }
+    }
+
+    operation MontgomeryMultiplyConstant(left : Qubit[], right : Int, results : Qubit[], space : MontgomerySpace) : Unit {
+        use p = Qubit[2 * space::logAux] {
+            MultiplyConstant(left, right, p);
+            MontgomeryReduce(p, space);
+
+            for i in 0 .. space::logAux - 1 {
+                SWAP(p[i], results[i]);
+            }
+
+            ResetAll(p);
+        }
+    }
+
+    operation MontgomeryTransform(value : Qubit[], space : MontgomerySpace) : Unit {
+        MontgomeryMultiplyConstant(value, space::aux * space::aux % space::modulus, value, space);
     }
 }
